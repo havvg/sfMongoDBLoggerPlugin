@@ -1,0 +1,76 @@
+h1. sfMongoDBLoggerPlugin
+
+The sfMongoDBLogger uses a MongoDB to log messages. It utilizes several features of the mongo extension and MongoDB itself.
+
+h2. Configuration
+
+There are several configuration options available.
+
+h3. Server configuration
+
+The basic configuration items to initialize a working MongoDB connection.
+
+* host, defaults to configured PHP host
+* port, defaults to configured PHP port
+
+These two options are required in order to get the logger working:
+
+* database
+* collection
+
+h4. Authentication configuration
+
+If you want to connect to the MongoDB as an authenticated user, you can put the information in these items. To disable this feature, configure it with false (default).
+
+* username
+* password
+
+h3. MongoDB write options
+
+By default the write operations on MongoDB are not synchronous. This implies that not all data sent to the server will actually be written to the persistent, in case something bad happens. However there are options to force the server to actually persist the data before returning the result state.
+
+The option @save@ takes three keys. (see http://docs.php.net/manual/en/mongocollection.insert.php)
+
+* safe 
+* fsync
+* timeout
+
+Each of these options default to the extensions default settings, but can be overwritten on a per logger basis. This way you can add an error logger with synchronous write operations while having a debug logger without.
+
+h3. Additional document information
+
+In order to append data to the written log document you can configure the @document@ option. It takes an associative array which will be added to the log document.
+
+These keys are reserved and will be overwritten by the logger:
+
+* message
+* time
+* priority
+
+h3. Example Configuration
+
+<pre>
+  logger:
+    class: sfMongoDBLogger
+    param:
+      level: debug
+      
+      # The MongoDB server
+      host: <?php echo Mongo::DEFAULT_HOST ?>
+      port: <?php echo Mongo::DEFAULT_PORT ?>
+      database: ~
+      collection: ~
+      
+      # Authentication information
+      username: false
+      password: false
+      
+      # Additional key: value entries on all log documents.
+      document: []
+        
+      # Options passed when inserting a new document
+      save:
+        safe: false
+        fsync: false
+        timeout: <?php echo MongoCursor::$timeout ?>
+</pre>
