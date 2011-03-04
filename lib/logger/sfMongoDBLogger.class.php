@@ -17,25 +17,6 @@ class sfMongoDBLogger extends sfLogger
   protected $collection;
 
   /**
-   * The list of options of this logger.
-   *
-   * @var array
-   */
-  protected $options = array();
-
-  /**
-   * Returns the value of the given option.
-   *
-   * @param string $name
-   *
-   * @return mixed
-   */
-  public function getOption($name)
-  {
-    return $this->options[$name];
-  }
-
-  /**
    * Returns the list of all options and their default value.
    *
    * @return array
@@ -60,6 +41,8 @@ class sfMongoDBLogger extends sfLogger
         'fsync' => false,
         'timeout' => MongoCursor::$timeout,
       ),
+
+      'create' => array(),
     );
   }
 
@@ -114,6 +97,11 @@ class sfMongoDBLogger extends sfLogger
       $this->handler = new Mongo(sprintf('mongodb://%s:%d', $this->options['host'], $this->options['port']));
     }
 
+    if (!empty($this->options['create']))
+    {
+      $this->handler->selectDB($this->options['database'])->createCollection($this->options['collection'], $this->options['create']['capped'], $this->options['create']['size'], $this->options['create']['max']);
+    }
+
     $this->collection = $this->handler->selectCollection($this->options['database'], $this->options['collection']);
 
     return parent::initialize($dispatcher, $this->options);
@@ -133,7 +121,7 @@ class sfMongoDBLogger extends sfLogger
       'priority' => $this->getPriority($priority)
     );
 
-    $this->collection->insert(array_merge($this->getOption('document'), $log), $this->getOption('save'));
+    $this->collection->insert(array_merge($this->options['document'], $log), $this->options['save']);
   }
 
   /**

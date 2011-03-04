@@ -47,6 +47,16 @@ These keys are reserved and will be overwritten by the logger:
 * time
 * priority
 
+h3. MongoDB create collection options
+
+By default MongoDB creates a collection on-the-fly where needed. If you want to create a collection with different parameters than the default ones, e.g. a capped collection, you can specify these options using the @create@ option.
+
+This option takes these keys. (see http://docs.php.net/manual/en/mongodb.createcollection.php)
+
+* capped
+* size
+* max
+
 h3. Example Configuration
 
 <pre>
@@ -73,4 +83,10 @@ h3. Example Configuration
         safe: false
         fsync: false
         timeout: <?php echo MongoCursor::$timeout ?>
+
+      # Options to create the collection.
+      create:
+        capped: false
+        size: 0
+        max: 0
 </pre>
