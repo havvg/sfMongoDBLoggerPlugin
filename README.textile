@@ -37,16 +37,6 @@ The option @save@ takes three keys. (see http://docs.php.net/manual/en/mongocoll
 
 Each of these options default to the extensions default settings, but can be overwritten on a per logger basis. This way you can add an error logger with synchronous write operations while having a debug logger without.
 
-h3. Additional document information
-
-In order to append data to the written log document you can configure the @document@ option. It takes an associative array which will be added to the log document.
-
-These keys are reserved and will be overwritten by the logger:
-
-* message
-* time
-* priority
-
 h3. MongoDB create collection options
 
 By default MongoDB creates a collection on-the-fly where needed. If you want to create a collection with different parameters than the default ones, e.g. a capped collection, you can specify these options using the @create@ option.
@@ -66,23 +56,20 @@ h3. Example Configuration
       level: debug
       
       # The MongoDB server
-      host: <?php echo Mongo::DEFAULT_HOST ?>
-      port: <?php echo Mongo::DEFAULT_PORT ?>
+      host: <?php echo Mongo::DEFAULT_HOST . "\n" ?>
+      port: <?php echo Mongo::DEFAULT_PORT . "\n" ?>
       database: ~
       collection: ~
       
       # Authentication information
       username: false
       password: false
-      
-      # Additional key: value entries on all log documents.
-      document: []
         
       # Options passed when inserting a new document
       save:
         safe: false
         fsync: false
-        timeout: <?php echo MongoCursor::$timeout ?>
+        timeout: <?php echo MongoCursor::$timeout . "\n" ?>
 
       # Options to create the collection.
       create:
@@ -90,3 +77,20 @@ h3. Example Configuration
         size: 0
         max: 0
 </pre>
+
+h2. Events
+
+h3. mongodblog
+
+h4. mongodblog.pre_insert
+
+_Notify method_: @filter@
+
+_Default notifiers_: @sfMongoDBLogger@
+
+This event passes the document (associative array: message, priority) to be inserted into MongoDB for further modification.
+
+The following listeners are bundled and can be connected to this event.
+
+* sfMongoDBLoggerListener::addTimestamp
+* sfMongoDBLoggerListener::convertLogPriority

@@ -32,9 +32,6 @@ class sfMongoDBLogger extends sfLogger
       'username' => false,
       'password' => false,
 
-      // meta information added to the document
-      'document' => array(),
-
       // MongoDB specific options
       'save' => array(
         'safe' => false,
@@ -115,25 +112,15 @@ class sfMongoDBLogger extends sfLogger
    */
   protected function doLog($message, $priority)
   {
-    $log = array(
+    $document = array(
       'message'  => $message,
-      'time'     => new DateTime(),
-      'priority' => $this->getPriority($priority)
+      'priority' => $priority
     );
 
-    $this->collection->insert(array_merge($this->options['document'], $log), $this->options['save']);
-  }
+    $event = new sfEvent($this, 'mongodblog.pre_insert');
+    $this->dispatcher->filter($event, $document);
 
-  /**
-   * Returns the priority string to use in log messages.
-   *
-   * @param  string $priority The priority constant
-   *
-   * @return string The priority to use in log messages
-   */
-  protected function getPriority($priority)
-  {
-    return sfLogger::getPriorityName($priority);
+    $this->collection->insert($event->getReturnValue(), $this->options['save']);
   }
 
   /**
