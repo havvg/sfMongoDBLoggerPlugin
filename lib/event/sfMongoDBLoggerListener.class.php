@@ -13,6 +13,7 @@ class sfMongoDBLoggerListener
   public static function addTimestamp(sfEvent $event, array $logEntry)
   {
     $logEntry['time'] = new DateTime();
+    $logEntry['timestamp'] = new MongoDate($logEntry['time']->format('U'));
 
     return $logEntry;
   }
