@@ -28,7 +28,10 @@ class sfMongoDBLoggerListener
    */
   public static function convertLogPriority(sfEvent $event, array $logEntry)
   {
-    $logEntry['priority'] = sfLogger::getPriorityName($logEntry['priority']);
+    if (is_int($logEntry['priority']))
+    {
+      $logEntry['priority'] = sfLogger::getPriorityName($logEntry['priority']);
+    }
 
     return $logEntry;
   }
